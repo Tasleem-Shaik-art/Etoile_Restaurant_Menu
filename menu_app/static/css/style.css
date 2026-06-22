@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Kept the dark background from image_0.png */
+    background-color: #2a2a2a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    
+}
+
+/* 1. Modifying Header Color - Make it visible */
+header {
+    text-align: center;
+    padding: 60px 20px 40px;
+}
+
+.visible-header {
+    color: #f1f5f9;  /* Bright off-white */
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Grid Layout to center cards */
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Card Design - Kept exact gray color */
+.menu-card {
+    background-color: #555555; /* Gray from image_0.png */
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card-top {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.selection-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e2e8f0; /* Soft gray for "Add to Order" */
+    font-size: 0.9rem;
+}
+
+/* Checkbox visibility check */
+.selection-box input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.visible-title {
+    color: #ffffff; /* Bright white */
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+/* 2. Update Description Color - Make it visible */
+.visible-description {
+    color: #cbd5e1; /* Clean light gray */
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.category-badge {
+    background-color: #0c1a40; /* Dark blue from image_0.png */
+    color: #ffffff; /* Bright white */
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.price-visible {
+    color: #fcae5c; /* Kept the exact orange color */
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 0;
+    color: #94a3b8;
+}
