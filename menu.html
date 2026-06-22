@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etoile Restaurant | Digital Menu</title>
+    <style>
+        /* CSS EMBEDDED DIRECTLY TO ENSURE VISIBILITY */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #2a2a2a !important; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding-bottom: 120px; /* Extra space for the sticky button bar */
+        }
+
+        header { text-align: center; padding: 60px 20px 40px; }
+
+        .visible-header {
+            color: #ffffff !important;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .menu-card {
+            background-color: #444444 !important;
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 1px solid #555;
+        }
+
+        .selection-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .visible-title {
+            color: #60a5fa !important;
+            font-size: 1.6rem;
+            margin-top: 10px;
+        }
+
+        .visible-description {
+            color: #e2e8f0 !important;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #666;
+            padding-top: 15px;
+        }
+
+        .category-badge {
+            background-color: #1e3a8a !important;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .price-visible {
+            color: #fbbf24 !important;
+            font-weight: 800;
+            font-size: 1.4rem;
+        }
+
+        /* STICKY ACTION BAR STYLING */
+        .action-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e1e; 
+            border: 1px solid #444;
+            padding: 15px 40px;
+            border-radius: 100px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            z-index: 999;
+        }
+
+        .action-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .confirm-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .confirm-btn:hover {
+            background: #1d4ed8;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+        }
+
+        #total-amount {
+            color: #fbbf24;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="visible-header">ETOILE RESTAURANT MENU</h1>
+    </header>
+
+    <!-- FORM WRAPS THE ENTIRE MENU AND ACTION BAR -->
+    <form method="POST" action="{% url 'place_order' %}">
+        {% csrf_token %}
+        
+        <div class="menu-container">
+            {% for item in items %}
+            <div class="menu-card">
+                <div class="selection-box">
+                    <!-- name="selected_items" is required for the Django view to get the list -->
+                    <input type="checkbox" name="selected_items" value="{{ item.id }}" id="item-{{ item.id }}" class="item-checkbox">
+                    <label for="item-{{ item.id }}">Add to Order</label>
+                </div>
+
+                <h3 class="visible-title">{{ item.name }}</h3>
+                <p class="visible-description">{{ item.description }}</p>
+                
+                <div class="card-footer">
+                    <span class="category-badge">{{ item.category }}</span>
+                    <!-- data-price used for JavaScript calculation -->
+                    <span class="price-visible" data-price="{{ item.price }}">${{ item.price }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <h2 style="text-align: center; grid-column: 1/-1;">No items found in database.</h2>
+            {% endfor %}
+        </div>
+
+        <!-- THE ACTION BAR WITH CONFIRM BUTTON -->
+        <div class="action-bar">
+            <div class="action-content">
+                <div class="total-section">
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">Selected Total</p>
+                    <h2 id="total-amount">$0.00</h2>
+                </div>
+                <button type="submit" class="confirm-btn">
+                    Confirm Order
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // Real-time calculation for the total amount
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const totalDisplay = document.getElementById('total-amount');
+
+        function calculateTotal() {
+            let total = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const card = cb.closest('.menu-card');
+                    const priceElement = card.querySelector('.price-visible');
+                    const price = parseFloat(priceElement.getAttribute('data-price'));
+                    total += price;
+                }
+            });
+            totalDisplay.innerText = "$" + total.toFixed(2);
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', calculateTotal);
+        });
+
+        // Trigger logic for the "Enter" key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                // We calculate total before allowing or stopping submission
+                calculateTotal();
+            }
+        });
+    </script>
+
+</body>
+</html>
